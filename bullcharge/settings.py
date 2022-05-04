@@ -101,6 +101,7 @@ EMAIL_HOST_PASSWORD = 'bullcharge'
 # Auth
 
 AUTH_USER_MODEL = 'convener.Convener'
+AUTHENTICATION_BACKENDS = ['convener.backends.ConvenerBackend']
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

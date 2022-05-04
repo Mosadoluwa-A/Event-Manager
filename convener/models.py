@@ -36,6 +36,7 @@ class UserManager(BaseUserManager):
 class Convener(AbstractUser):
     username = None
     email = models.EmailField(_('email address'), unique=True)
+    email_verified = models.BooleanField(default=False)
 
     objects = UserManager()
 
