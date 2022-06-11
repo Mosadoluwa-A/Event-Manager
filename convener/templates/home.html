@@ -7,7 +7,14 @@
 <body>
 
     <h2>Welcome to your dashboard convener!</h2>
+    <h4>Organizations so far.. <a href="{% url 'organization:add_organization' %}"><button>Add Organization</button></a></h4>
+    <ul>
 
+    {% for org in orgs %}
+        <li><a href="#">{{ org }}</a></li>
+    {% endfor %}
+
+    </ul>
     <form method="POST" action="{% url 'logout_user' %}">
          {% csrf_token %}
         <button type="submit">Logout</button>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Organization</title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+</head>
+<style>
+    .select2-container .select2-selection--single{
+    height:34px !important;
+}
+.select2-container--default .select2-selection--single{
+         border: 1px solid #ccc !important; 
+     border-radius: 0px !important; 
+}
+</style>
+<body>
+    <h2>Add Organization</h2>
+
+    <form id="add-org" method="POST" action=" ">
+        {% csrf_token %}
+        <p><label for="id_name">Name:</label> <input type="text" name="name" maxlength="100" required id="id_name" form="add-org"></p>
+        <p class="w-25"><label for="pic">Person In Charge: </label> <select id="pic" name="person_in_charge" class="form-control select2" form="add-org">
+            <option>Select PIC</option>
+            {% for pic in pics %}
+                <option value="{{ pic.id }}">{{ pic.email}}</option>
+            {% endfor %}
+        </select>
+        </p>
+       
+        <p><label for="id_mrun_slots">Mrun slots:</label> <input type="number" name="mrun_slots" value="5" required id="id_mrun_slots" form="add-org"></p>
+<p><label for="id_cchal_slots">Cchal slots:</label> <input type="number" name="cchal_slots" value="5" required id="id_cchal_slots" form="add-org"></p>
+        <button type="submit">Add Organization</button>
+    </form>
+
+    <div class="mt-2">
+    <label for="add_pic">PIC not found?</label>
+    <!-- <form id="pic-form" method="POST"> -->
+        <!-- {% csrf_token %} -->
+        <input id="add_pic" placeholder="PIC Email" required>
+        <input type="submit" id="add_pic_submit" value="Add PIC">
+    <!-- </form> -->
+    </div>
+    
+</body>
+<script>
+    $('.select2').select2();
+
+    $('#add_pic_submit').click(function(){
+
+        $.ajax({
+            type: "POST",
+            url: "add_pic/",
+            data: {
+                pic_email: $('#add_pic').val(),
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+            },
+            success: function(){
+                location.reload()
+                $("#add_pic").val("")
+                alert("PIC has been added successfully")
+            }
+        });
+    });
+</script>
+</html>

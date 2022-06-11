@@ -2,10 +2,12 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from .forms import ConvenerLogin
+from organization.models import Organization
 
 
 def home(request):
-    return render(request, 'home.html')
+    orgs = Organization.objects.all()
+    return render(request, 'home.html', {"orgs": orgs})
 
 # Auth
 

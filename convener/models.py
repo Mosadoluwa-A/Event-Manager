@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
@@ -12,14 +13,45 @@ class UserManager(BaseUserManager):
             raise ValueError('Users require an email field')
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
+        print(f"The type of the new user is {type(user)}")
+        if password is None:
+            import string
+            letters = string.ascii_letters
+            digits = string.digits
+            symbols = string.punctuation
+            pass_chars = letters + digits + symbols
+            print(f"The length of the characters is {len(pass_chars)}")
+            password = self.make_random_password(10, pass_chars)
+            print(f"The password of the new user is {password}")
         user.set_password(password)
         user.save(using=self._db)
+        subject = "Your Login Details"
+        msg = f'''
+               Your password is {password}
+            Please verify your email via this link: 
+            '''
+        user.email_user(subject, msg)
         return user
 
     def create_user(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
         return self._create_user(email, password, **extra_fields)
+
+    def get_or_create_user(self, email):
+        try:
+            print(f"The email is {email}")
+            user = self.model.objects.get(email=email)
+            if user:
+                print(f"The user is {user.email}")
+            else:
+                print("This user does not exist")
+                user = self.create_user(email)
+                print(f"The New user is {user.email}")
+        except Exception as e:
+            print(e)
+        else:
+            return user
 
     def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault('is_staff', True)
