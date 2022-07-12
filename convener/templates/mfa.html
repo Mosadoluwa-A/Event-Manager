@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verification</title>
+</head>
+<body>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+			{% if message.level == 25 %}
+				<div class="alert  alert-success {{ message.tags }} alert-dismissible w-25 mt-2" role="alert">
+					<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					{{ message | safe }}
+				</div>
+			{% else %}
+				<div class="alert  alert-danger {{ message.tags }} alert-dismissible w-25 mt-2" role="alert">
+					<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					{{ message | safe }}
+				</div>
+			{% endif %}
+        {% endfor %}
+    </ul>
+    {% endif %}
+    <h2>Administrator Login</h2>
+    <p>Please enter that code that was sent to your email</p>
+
+    <form method="POST" action=" ">
+        {% csrf_token %}
+        <input type="text" name="otp" placeholder="Enter the code">
+        <input type="submit" value="Submit">
+    </form>
+
+    <span id="resend_otp"></span>
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</body>
+<script>
+    const resendTimeout = setTimeout(showResend, 20000); // This is to delay the resend option from showing
+    function showResend(){   // Till after 20 seconds
+        $("#resend_otp").html("<a href=#>Resend Code</a>")
+        console.log('This part is proccessed') 
+    }
+    $("#resend_otp").click(function(){
+        console.log("Sending Ajax...")
+        $.ajax({
+            type: "POST",
+            url: "resend_otp/",
+            data: {
+                resend_otp: true,
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+            },
+            success: function () {
+                        console.log("Ajax success!")
+                        let currentTime = new Date().getTime();
+                        let futureTime = currentTime + 900000; // 15 minutes
+                        let x = setInterval(function() {   // This is to make the time update every second
+                            let now = new Date().getTime();
+                            let distance = futureTime - now;
+                            
+                            let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                            let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                            
+                       $("#resend_otp").text("Try again in " + minutes + "m " + seconds + "s"); // Display the updated time
+                        console.log($("#resend_otp").text());
+                            if (distance < 0) {  // check if the time is reached
+                                clearInterval(x);
+                                $("#resend_otp").html("<a href=#>Resend Code </a>");
+                            }
+                            
+                        }, 1000)
+                    }
+        });
+        console.log("Ajax Sent!")
+    })
+</script>
+</html>

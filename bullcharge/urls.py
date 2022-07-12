@@ -15,13 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from convener.views import login_user, logout_user, home
+from convener.views import login_user, logout_user, home, validate_mfa, resend_token
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', login_user, name='login_user'),
     path('logout_user', logout_user, name='logout_user'),
     path('home/', home, name='home'),
+    path("validate_mfa", validate_mfa, name='validate_mfa'),
+    path('resend_otp/', resend_token, name='resend_token'),
     # Organization
     path("organization/", include("organization.urls", "organization")),
 ]

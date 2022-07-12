@@ -85,6 +85,11 @@ class Event(models.Model):
     location = models.TextField()
     total_mrun_slots = models.IntegerField(verbose_name="Total Mass Run Slots")
     total_cchal_slots = models.IntegerField(verbose_name="Total Chief Challenge Slots")
+    STATUSES = (
+        ("ongoing", "Ongoing"),
+        ("concluded", "Concluded"),
+    )
+    status = models.CharField(max_length=10, choices=STATUSES, default=STATUSES[0])
 
     def __str__(self):
         return self.name

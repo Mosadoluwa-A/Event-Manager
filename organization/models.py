@@ -1,6 +1,8 @@
 from django.db import models
 from convener.models import Convener, Event
 from django.utils.translation import gettext_lazy as _
+import random
+import string
 
 
 class PIC(Convener):
@@ -9,6 +11,10 @@ class PIC(Convener):
     class Meta:
         verbose_name = _('Person-In-Charge')
         verbose_name_plural = _('Persons-In-Charge')
+
+
+def gen_code(size=3, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for x in range(size))
 
 
 class Organization(models.Model):
@@ -28,14 +34,21 @@ class Organization(models.Model):
     def __str__(self):
         return self.name
 
+    def update_event(self, event):
+        new_total_cchal_slots = event.total_cchal_slots - self.cchal_slots
+        new_total_mrun_slots = event.total_mrun_slots - self.mrun_slots
+        try:
+            event.total_cchal_slots = new_total_cchal_slots
+            event.total_mrun_slots = new_total_mrun_slots
+            event.save()
+            return "Event successfully updated"
+        except Exception as e:
+            print(e)
+            return "Update failed"
+
     def save(self, *args, **kwargs):
-        import random
-        import string
 
-        def gen_code(size=3, chars=string.ascii_uppercase + string.digits):
-            return ''.join(random.choice(chars) for x in range(size))
-
-        if self.mrun_code and self.cchal_code is None:
+        if self.mrun_code is None and self.cchal_code is None:
             mass_run = "MR" + gen_code()
             chief_chal = "CC" + gen_code()
             self.mrun_code = mass_run

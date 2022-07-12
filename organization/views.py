@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user
 from django.contrib import messages
+from django.db.models import Q
 from .models import PIC
 from convener.models import Event
 from .forms import OrganizationAddForm
@@ -13,12 +14,13 @@ def add_organisation(request):
     if request.method == "POST":
         # pic = PIC.objects.get_or_create_user(request.POST['person_in_charge'])
         convener = get_user(request)
-        event = Event.objects.get(convener=convener)  # the overall event
+        event = Event.objects.get(Q(convener=convener, status='ongoing'))  # the overall event
         form = OrganizationAddForm(request.POST)
         if form.is_valid():
             new_org = form.save(commit=False)
             new_org.save()
             new_org.events.add(event)  # Add this organization to the event
+            new_org.update_event(event)
             messages.success(request, "Organization Added Successfully")
             return redirect(home)
         print(form.errors)
