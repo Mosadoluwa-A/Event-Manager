@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Home</title>
+    </head>
+    <body>
+        <h2>Participant Information</h2>
+        <h4>Registration ID: &nbsp; {{ participant.reg_id }}</h4>
+        <table>
+            <tbody>
+                <tr>
+                    <th>Name</th>
+                    <th>Race Category</th>
+                </tr>
+                <tr>
+                    <td>{{ participant.first_name }} {{ participant.last_name }}</td>
+                    <td>{{participant.category}}</td>
+                </tr>
+                <tr>
+                    <th>Country</th>
+                    <th>Organization</th>
+                </tr>
+                <tr>
+                    <td>{{ participant.country.name }}</td>
+                    <td>{{ participant.organization.name }}</td>
+                </tr>
+                <tr>
+                    <th>Email</th>
+                    <th>Team</th>
+                </tr>
+                <tr>
+                    <td>{{ participant.email }}</td>
+                    <td></td>
+                </tr>
+            </tbody>   
+        </table>
+        {% csrf_token %}
+        <button id="part_resend_conf">Resend Confirmation Email</button>
+
+        <h4>Team Challenge</h4>
+        <p>You can create or join a team of up to 4 team members.</p>
+
+        <button>Create Team</button> <button>Join Team</button>
+        
+        <form method="POST" action="{% url 'organization:par_logout' %}">
+            {% csrf_token %}
+            <p><button type="submit">Logout</button></p>
+        </form>
+
+    </body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $('#part_resend_conf').click(() => {
+            $.ajax({
+                type: "POST",
+                url: "resend_email",
+                data: {
+                    resend_email: true,
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+                },
+                success: () => {
+                    alert("Email sent successfully!")
+                    console.log("Email sent successfuly!")
+                }
+            })
+        })
+    </script>
+</html>

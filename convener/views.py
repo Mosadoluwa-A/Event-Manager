@@ -4,14 +4,21 @@ from django.contrib.auth import login, logout, authenticate
 from django.core.mail import send_mail
 from .forms import ConvenerLogin
 from convener.models import Convener
-from organization.models import Organization, gen_code
+from organization.models import Organization,PIC,gen_code
 import string
 from datetime import datetime, timedelta
 
 
 def home(request):
     orgs = Organization.objects.all()
-    return render(request, 'home.html', {"orgs": orgs})
+    try:
+        if request.user.pic:
+            org = Organization.objects.get(person_in_charge=request.user)
+            context = {"org": org, "pic": True}
+            return render(request, 'home.html', context)
+    except Exception:
+        context = {"orgs": orgs}
+        return render(request, 'home.html', context)
 
 # Auth
 
@@ -45,10 +52,14 @@ def validate_mfa(request):
             if token == request.session['token'] and datetime.now() < token_expiry:
                 request.session['allow_mfa'] = False
                 user_email = request.session['user_email']
-                user = Convener.objects.get(email=user_email)
-                login(request, user)
-                messages.success(request, "Login Success")
-                return redirect(home)
+                try:
+                    user = PIC.objects.get(email=user_email)
+                except PIC.DoesNotExist:
+                    user = Convener.objects.get(email=user_email)
+                finally:
+                    login(request, user)
+                    messages.success(request, "Login Success")
+                    return redirect(home)
             messages.error(request, "OTP is invalid!")
             return render(request, 'mfa.html')
         except KeyError:

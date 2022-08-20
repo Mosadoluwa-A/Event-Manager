@@ -1,0 +1,62 @@
+{% load cache %}
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta charset="UTF-8">
+    <title>Bullcharge</title>
+    </head>
+
+    <body>
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                {% if message.level == 25 %}
+                    <div class="alert  alert-success {{ message.tags }} alert-dismissible w-25 mt-2" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        {{ message | safe }}
+                    </div>
+                {% else %}
+                    <div class="alert  alert-danger {{ message.tags }} alert-dismissible w-25 mt-2" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        {{ message | safe }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+        <h1>Event Registration</h1>
+        <h3>Amazon Corporation</h3>
+        <h4>Category: Mass Run</h4>
+        <h5>Price: Free</h5>
+        <form id="#add_participant" method="POST" action=" ">
+            {% csrf_token %}
+           <p><input type="text" name="first_name" placeholder="First Name" required></p>
+           <p><input type="text" name="last_name" placeholder="Last Name" required></p>
+           <select name="gender" required>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+           </select><br>
+           {% cache 600 country %}
+           <select name="country" required>
+                {% for country in countries %}
+                    <option value="{{ country.code }}">{{ country.name }}</option>
+                {% endfor %}
+           </select>
+           {% endcache %}
+           <p><input type="email" name="email" placeholder="Email" required></p>
+           <p><input type="email" name="email2" placeholder="Confirm Email" required></p>
+
+           <!-- <label for="tac"> I have read and understood <a href="#">the statement</a>. I agree to the content in the statement.</label>
+           <input type="checkbox" id="tac" required> -->
+           
+           <button type="submit">Submit</button>
+
+        </form>
+    </body>
+
+</html>
+

@@ -5,20 +5,76 @@
     <title>Home</title>
 </head>
 <body>
-
+    {% if pic %}
+    <h2>Welcome to your dashboard {{org.name}}!</h2>
+    <table border="1">
+        <thead>
+            <th>Category</th>
+            <th>Registration Code</th>
+            <th>Slots</th>
+            <th>Redeemed</th>
+            <th>Bulk Import<input type="file"></th>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Mass Run</td>
+                <td>{{ org.mrun_code }}</td>
+                <td>{{ org.mrun_slots }}</td>
+                <td>{{ org.mrun_taken }}</td>
+                <td><button>Register</button></td>
+            </tr>
+            <tr>
+                <td>Chief Challenge</td>
+                <td>{{ org.cchal_code }}</td>
+                <td>{{ org.cchal_slots }}</td>
+                <td>{{ org.cchal_taken }}</td>
+                <td><button>Register</button></td>
+            </tr>
+        </tbody>
+    </table>
+    &nbsp;
+    {% else %}
     <h2>Welcome to your dashboard convener!</h2>
     <h4>Organizations so far.. <a href="{% url 'organization:add_organization' %}"><button>Add Organization</button></a></h4>
     <ul>
 
-    {% for org in orgs %}
+    <!-- {% for org in orgs %}
         <li><a href="#">{{ org }}</a></li>
-    {% endfor %}
+    {% endfor %} -->
+    
+        <table>
+            <thead>
+                <th>No</th>
+                <th>Organization</th>
+                <th>PIC Email</th>
+                <th>#Massrun Slots</th>
+                <th>#Chief Slots</th>
+                <th>#Massrun Taken</th>
+                <th>#Chief Taken</th>
+                <th>Actions</th>
+            </thead>
+            <tbody>
+                {% for org in orgs %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><a href="#">{{ org.name }}</a></td>
+                        <td>{{ org.person_in_charge.email }}</td>
+                        <td>{{ org.mrun_slots }}</td>
+                        <td>{{ org.cchal_slots }}</td>
+                        <td>{{ org.mrun_taken }}</td>
+                        <td>{{ org.cchal_taken }}</td>
+                        <td><a href="#">Edit</a> &nbsp; <a href="#">Delete</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p>{{ pic }}</p>
 
     </ul>
+    {% endif %}
     <form method="POST" action="{% url 'logout_user' %}">
-         {% csrf_token %}
-        <button type="submit">Logout</button>
-    </form>
-
+        {% csrf_token %}
+       <button type="submit">Logout</button>
+   </form>
 </body>
 </html>

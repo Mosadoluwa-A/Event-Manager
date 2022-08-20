@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Privacy Statement</title>
+    </head>
+
+    <body>
+        <h3 align="center">Privacy Statements</h3>
+
+        <form method="POST" action=" ">
+            {% csrf_token %}
+            <textarea rows="5">
+                {{ privacy_statement }}
+            </textarea>
+            <label for="agree">I have read and agree to the terms above</label>
+            <input type="checkbox" name="agree" id="agree" required>
+
+            <input type="submit" value="Continue">
+        </form>
+    </body>
+</html>

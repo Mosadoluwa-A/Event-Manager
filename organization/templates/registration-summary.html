@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Summary</title>
+    </head>
+
+    <body>
+        <h2>Registration Summary</h2>
+
+        <p>Thank you for registering for BULLCHARGE</p>
+        <p>We are pleased to confirm your registration. A confirmation email has been sent to your email address with 
+        further instructions
+        </p>
+        <p>Your registration confirms that you have read, understood and agreed to the event Terms and Conditions.</p>
+
+        <h4>Particulars</h4>
+        <table>
+            <tbody>
+                <tr>
+                    <th>Name</th>
+                    <th>Registration ID</th>
+                    <th>Category</th>
+                </tr>
+                <tr>
+                    <td>{{ first_name }} {{ last_name }}</td>
+                    <td>{{reg_id}}</td>
+                    <td>{{ category }}</td>
+                </tr>
+                <tr>
+                    <th>Email</th>
+                    <th>Gender</th>
+                    <th>Country</th>
+                </tr>
+                <tr>
+                    <td>{{ email }}</td>
+                    <td>{{ gender }}</td>
+                    <td>{{ country }}</td>
+                </tr>
+            </tbody>   
+        </table>
+
+        <h4>Team Challenge</h4>
+        <p>You can start or join a team of up to 4 members</p>
+
+        <button>Create Team</button> <button>Join Team</button>
+    </body>
+</html>

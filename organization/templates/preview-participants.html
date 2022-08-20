@@ -1,0 +1,61 @@
+{% load cache %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Preview Participant</title>
+    </head>
+
+    <body>
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                {% if message.level == 25 %}
+                    <div class="alert  alert-success {{ message.tags }} alert-dismissible w-25 mt-2" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        {{ message | safe }}
+                    </div>
+                {% else %}
+                    <div class="alert  alert-danger {{ message.tags }} alert-dismissible w-25 mt-2" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        {{ message | safe }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+        <h1>Event Registration</h1>
+        <h3>Amazon Corporation</h3>
+        <h4>Category: Mass Run</h4>
+        <h5>Price: Free</h5>
+        <form id="#add_participant" method="POST" action=" ">
+            {% csrf_token %}
+           <input type="text" name="first_name" placeholder="First Name" value="{{ first_name }}" required>
+           <input type="text" name="last_name" placeholder="Last Name" value=" {{ last_name }} " required>
+           <select name="gender" required>
+            {% if gender == male %}
+                <option value="male" selected>Male</option>
+                <option value="female">Female</option>
+            {% else %}
+                <option value="male">Male</option>
+                <option value="female" selected>Female</option>
+            {% endif %}
+           </select>
+           {% cache 600 country %}
+           <select name="country" required>
+                {% for country in countries %}
+                    <option value="{{ country.code }}">{{ country.name }}</option>
+                {% endfor %}
+           </select>
+           {% endcache %}
+           <input type="email" name="email" placeholder="Email" value="{{ email }}" required>
+           <input type="email" name="email2" placeholder="Confirm Email" value="{{ email2 }}" required>
+
+           <input type="submit" value="Confirm">
+
+        </form>
+    </body>
+</html>

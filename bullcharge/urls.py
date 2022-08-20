@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from convener.views import login_user, logout_user, home, validate_mfa, resend_token
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', login_user, name='login_user'),
