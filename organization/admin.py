@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Organization, PIC, Category, Participant, Policy
+from .models import Organization, PIC, Category, Participant, Policy, Team
 from convener.admin import ConvenerAdmin
 from django.utils.translation import gettext_lazy as _
 
@@ -26,8 +26,18 @@ class ParticipantAdmin(admin.ModelAdmin):
     exclude = ["reg_id"]
 
 
+@admin.display(description="No of Participants")
+def check_slots(obj):
+    return obj.participants.count()
+
+
+class TeamAdmin(admin.ModelAdmin):
+    list_display = ("name", "motto", "category", check_slots)
+
+
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(PIC, PICAdmin)
 admin.site.register(Category)
 admin.site.register(Participant, ParticipantAdmin)
 admin.site.register(Policy)
+admin.site.register(Team, TeamAdmin)

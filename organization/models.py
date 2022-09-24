@@ -6,6 +6,27 @@ import random
 import string
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name_plural = _('Categories')
+
+    def __str__(self):
+        return self.name
+
+
+class Team(models.Model):
+    name = models.CharField(max_length=12)
+    motto = models.CharField(max_length=50)
+    created = models.DateTimeField(auto_now_add=True)
+    creator = models.CharField(max_length=100)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True, related_name="teams")
+
+    def __str__(self):
+        return self.name
+
+
 class PIC(Convener):
     phone_no = models.BigIntegerField(null=True)
 
@@ -28,6 +49,7 @@ class Organization(models.Model):
     cchal_slots = models.IntegerField(default=5)
     mrun_taken = models.IntegerField(default=0)
     cchal_taken = models.IntegerField(default=0)
+    team = models.ForeignKey(Team, null=True, blank=True, on_delete=models.SET_NULL, related_name="organizations")
 
     class Meta:
         ordering = ['name']
@@ -68,16 +90,6 @@ class Organization(models.Model):
         super().save(*args, **kwargs)
 
 
-class Category(models.Model):
-    name = models.CharField(max_length=100)
-
-    class Meta:
-        verbose_name_plural = _('Categories')
-
-    def __str__(self):
-        return self.name
-
-
 class Participant(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
@@ -92,6 +104,7 @@ class Participant(models.Model):
     category = models.ForeignKey(Category, null=True, on_delete=models.SET_NULL, related_name='participants')
     created = models.DateTimeField(auto_now_add=True)
     reg_id = models.IntegerField(blank=True, unique=True)
+    team = models.ForeignKey(Team, null=True, on_delete=models.SET_NULL, related_name="participants")
 
     class Meta:
         ordering = ['created']
@@ -119,3 +132,6 @@ class Policy(models.Model):
 
     def __str__(self):
         return self.name
+
+
+

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Add Team</title>
+    </head>
+    <body>
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                {% if message.level == 25 %}
+                    <div class="alert  alert-success {{ message.tags }} alert-dismissible w-25 mt-2" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        {{ message | safe }}
+                    </div>
+                {% else %}
+                    <div class="alert  alert-danger {{ message.tags }} alert-dismissible w-25 mt-2" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        {{ message | safe }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+        <h2>Add Team</h2>
+
+        <form method="post" action="  ">
+            {% csrf_token %}
+            <p><input type="text" name="name" placeholder="Team Name (Max 12)" maxlength="12" required></p>
+            <p><input type="text" name="motto" placeholder="Enter the Team Motto" maxlength="50" required></p>
+            <p><input type="submit" value="Submit"></p>
+        </form>
+
+    </body>
+</html>

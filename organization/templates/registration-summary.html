@@ -42,6 +42,6 @@
         <h4>Team Challenge</h4>
         <p>You can start or join a team of up to 4 members</p>
 
-        <button>Create Team</button> <button>Join Team</button>
+        <a href="{% url 'organization:add_team' %}"><button>Create Team</button></a> <a href="{% url 'organization:join_team' %}"><button>Join Team</button></a>
     </body>
 </html>

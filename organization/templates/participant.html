@@ -30,7 +30,7 @@
                 </tr>
                 <tr>
                     <td>{{ participant.email }}</td>
-                    <td></td>
+                    <td align="center"> {{ participant.team }} </td>
                 </tr>
             </tbody>   
         </table>
@@ -40,7 +40,7 @@
         <h4>Team Challenge</h4>
         <p>You can create or join a team of up to 4 team members.</p>
 
-        <button>Create Team</button> <button>Join Team</button>
+        <a href="{% url 'organization:add_team' %}"><button>Create Team</button></a> <a href="{% url 'organization:join_team' %}"><button>Join Team</button></a>
         
         <form method="POST" action="{% url 'organization:par_logout' %}">
             {% csrf_token %}

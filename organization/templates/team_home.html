@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Team</title>
+    </head>
+    <body>
+        <h2>Team {{ team.name }}</h2>
+        <h4><i>{{ team.motto }}</i></h4>
+
+        <p>Below are the team members</p>
+        <ul>
+            {% for member in team.participants.all %}
+                <li>{{ member }}</li>
+            {% empty %}
+                <p>There is no team yet</p>
+            {% endfor %}
+        </ul>
+
+    </body>
+</html>

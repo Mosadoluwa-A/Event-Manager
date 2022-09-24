@@ -4,9 +4,9 @@ from django.contrib import messages
 from django.db.models import Q
 from django.core.mail import send_mail
 from django.core.cache import cache
-from .models import PIC, Organization, Category, Policy, Participant
+from .models import PIC, Organization, Category, Policy, Participant, Team
 from convener.models import Event
-from .forms import OrganizationAddForm, ParticipantAddForm
+from .forms import OrganizationAddForm, ParticipantAddForm, CreateTeamForm
 from convener.views import home
 from django_countries import countries
 
@@ -80,10 +80,10 @@ def check_org(request):
                 org = Organization.objects.get(mrun_code=org_reg_id)
 
                 if org.mrun_slots != 0:
-                    cache.set('reg_id', org_reg_id, 600)
+                    cache.set('reg_id', org_reg_id, 900)
                     # request.session['org_id'] = org.id
-                    cache.set('org_id', org.id, 600)
-                    cache.set('category', "Mass Run", 600)
+                    cache.set('org_id', org.id, 900)
+                    cache.set('category', "Mass Run", 900)
                     return redirect("organization:add_participant")
             except Exception as e:
                 print(e)
@@ -93,9 +93,9 @@ def check_org(request):
             try:
                 org = Organization.objects.get(cchal_code=org_reg_id)
                 if org.cchal_slots != 0:
-                    cache.set('reg_id', org_reg_id, 600)
-                    cache.set('org_id', org.id, 600)
-                    cache.set('category', "Mass Run", 600)
+                    cache.set('reg_id', org_reg_id, 900)
+                    cache.set('org_id', org.id, 900)
+                    cache.set('category', "Mass Run", 900)
                     return redirect("organization:add_participant")
             except Exception as e:
                 print(e)
@@ -112,12 +112,12 @@ def get_participant_data(request):  # First view to get the data before passing 
         email = request.POST['email']
         email2 = request.POST['email2']
         country = request.POST['country']
-        cache.set('first_name', first_name, 600)
-        cache.set('last_name', last_name, 600)
-        cache.set('gender', gender, 600)
-        cache.set('email', email, 600)
-        cache.set('email2', email2, 600)
-        cache.set('country', country, 600)
+        cache.set('first_name', first_name)
+        cache.set('last_name', last_name)
+        cache.set('gender', gender)
+        cache.set('email', email)
+        cache.set('email2', email2)
+        cache.set('country', country)
         return redirect("organization:tna")
 
     context = {"countries": countries}
@@ -147,7 +147,7 @@ def add_participant(request):
             print(f"The new participant email is {new_participant.email}")
             new_participant.save()
             part_reg_id = new_participant.reg_id
-            cache.set('reg_id', part_reg_id, 600)
+            cache.set('reg_id', part_reg_id, 900)
             update_slots(reg_id, org)
             subj = "Bullcharge Confirmation Email"
             msg = f"This is to confirm your successful registration for bullcharge your registration code is {new_participant.reg_id}"
@@ -159,8 +159,8 @@ def add_participant(request):
                 recipient_list=recp,
                 fail_silently=False,
             )
-            cache.set('participant_id', new_participant.id, 600)
-            cache.set('par_reg_id', new_participant.reg_id, 600)
+            cache.set('participant_id', new_participant.id, 900)
+            cache.set('par_reg_id', new_participant.reg_id, 900)
             return redirect("organization:reg_summary")
         else:
             print(form.errors)
@@ -210,8 +210,9 @@ def participant_status(request):
         try:
             participant = Participant.objects.get(Q(reg_id=reg_id), Q(email=email))
             if participant:
-                cache.set("auth", True, 300)
-                cache.set("email", email, 600)
+                cache.set("auth", True, 900)
+                cache.set("email", email, 900)
+                cache.set("par_reg_id", participant.reg_id, 900)
                 par_id = participant.id
                 return redirect("organization:par_home", par_id)
         except Exception as e:
@@ -251,7 +252,8 @@ def participant_home(request, par_id):
             return render(request, 'participant.html', context)
         messages.error(request, 'You need to be verified')
         return redirect("organization:par_status")
-    except:
+    except Exception as e:
+        print(e)
         messages.error(request, 'You need to be verified')
         return redirect("organization:par_status")
 
@@ -260,3 +262,73 @@ def par_logout(request):
     if request.method == "POST":
         cache.delete('auth')
         return redirect('organization:par_status')
+
+
+def create_team(request):
+    if request.method == "POST":
+        if request.user.is_anonymous:
+            reg_id = cache.get('par_reg_id')
+            participant = Participant.objects.get(reg_id=reg_id)
+            creator = participant.email
+            category = participant.category
+            form = CreateTeamForm(request.POST)
+            if form.is_valid() and participant.team is None:
+                new_team = form.save(commit=False)
+                new_team.category = category
+                new_team.creator = creator
+                new_team.save()
+                cache.set("team_id", new_team.id, 900)
+                participant.team = new_team
+                participant.save()
+                print(f"The team of the participant {participant.team}")
+                return redirect('organization:team_home')
+            messages.error(request, "You can only be in one team at a time")
+            return redirect('organization:add_team')
+        else:
+            creator = request.user.email
+            organisation = request.user.organizations.first()
+            form = CreateTeamForm(request.POST)
+            if form.is_valid():
+                new_team = form.save(commit=False)
+                new_team.creator = creator
+                new_team.save()
+                cache.set("team_id", new_team.id, 900)
+                organisation.team = new_team
+                organisation.save()
+                return redirect('organization:team_home')
+            messages.error(request, "Please fill all fields")
+            return redirect(create_team)
+    return render(request, 'add_team.html')
+
+
+def team_home(request):
+    if request.method == "GET":
+        team_id = cache.get("team_id")
+        print(f"The team id is {team_id}")
+        team = Team.objects.get(id=team_id)
+        return render(request, 'team_home.html', {"team": team})
+    return render(request, '404.html')
+
+
+def join_team(request):
+    if request.method == "POST":
+        team = request.POST['team']
+        try:
+            team_obj = Team.objects.get(name__iexact=team)
+            reg_id = cache.get("par_reg_id")
+            participant = Participant.objects.get(reg_id=reg_id)
+            if team_obj and team_obj.participants.all().count() < 4:
+                if team_obj.category == participant.category and participant.team is None:
+                    participant.team = team_obj
+                    participant.save()
+                    cache.set("team_id", team_obj.id)
+                    return redirect("organization:team_home")
+                messages.error(request, "You cannot join a team outside your category")
+                return redirect("organization:join_team")
+            messages.error(request, "The team does not exist or has run out slots try another")
+            return redirect("organization:join_team")
+        except Exception as e:
+            print(e)
+            messages.error(request, "You cannot join a team outside your category")
+            return redirect("organization:join_team")
+    return render(request, 'join_team.html')

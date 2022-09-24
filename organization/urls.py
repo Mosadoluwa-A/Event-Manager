@@ -15,5 +15,8 @@ urlpatterns = [
     path('participant/status', views.participant_status, name='par_status'),
     path('participant/<int:par_id>', views.participant_home, name="par_home"),
     path('participant/resend_email', views.resend_email, name='resend_email'),
-    path('participant/logout', views.par_logout, name='par_logout')
+    path('participant/logout', views.par_logout, name='par_logout'),
+    path('team', views.team_home, name='team_home'),
+    path('team/add', views.create_team, name='add_team'),
+    path('team/join', views.join_team, name="join_team")
 ]

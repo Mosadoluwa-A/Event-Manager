@@ -1,5 +1,5 @@
 from django.forms import ModelForm, CharField
-from .models import Organization, Participant
+from .models import Organization, Participant, Team
 
 
 class OrganizationAddForm(ModelForm):
@@ -14,3 +14,9 @@ class ParticipantAddForm(ModelForm):
     class Meta:
         model = Participant
         fields = ['first_name', 'last_name', 'email', 'gender', 'country']
+
+
+class CreateTeamForm(ModelForm):
+    class Meta:
+        model = Team
+        fields = ['name', 'motto']
